@@ -13,6 +13,7 @@ import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 
@@ -22,7 +23,6 @@ const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO
 const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
 const val CHANNEL_ID = "audio_service"
 const val NOTIFICATION_ID = 1
-const val FACTOR = 2
 
 class AudioService : Service() {
 
@@ -45,9 +45,9 @@ class AudioService : Service() {
         audioTrack = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                .build())
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build())
             .setAudioFormat(AudioFormat.Builder()
                 .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
                 .setSampleRate(SAMPLE_RATE)
@@ -60,7 +60,7 @@ class AudioService : Service() {
     }
 
     private fun startForegroundService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Audio Service",
@@ -81,6 +81,8 @@ class AudioService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         isRecording = true
+        val factor = intent?.getDoubleExtra("factor", 1.0) ?: 1.0
+        Log.d("AudioService", "Factor received: $factor")
         thread = Thread {
             val buffer = ByteArray(bufferSize)
             val shortBuffer = ShortArray(bufferSize/2)
@@ -90,7 +92,7 @@ class AudioService : Service() {
                 val numBytesRead = audioRecord.read(buffer, 0, bufferSize)
                 if (numBytesRead > 0) {
                     for (i in 0..<numBytesRead step 2) {
-                        var sound = (((buffer[i + 1].toInt() shl 8) or (buffer[i].toInt() and 0xFF))*FACTOR).toShort()
+                        var sound = (((buffer[i + 1].toInt() shl 8) or (buffer[i].toInt() and 0xFF))*factor).toInt().toShort()
                         if (sound > Short.MAX_VALUE) {
                             sound = Short.MAX_VALUE
                         } else if (sound < Short.MIN_VALUE) {
@@ -110,7 +112,9 @@ class AudioService : Service() {
         super.onDestroy()
         isRecording = false
         audioRecord.stop()
+        audioRecord.release()
         audioTrack.stop()
+        audioRecord.release()
         thread?.interrupt()
     }
 
