@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settingsButton: Button
     private var factor = 1.0
     private var isRunning = false
-    private var bluetoothPermissionGranted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -156,8 +155,6 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (!(requestCode == REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
             Toast.makeText(this@MainActivity, "Please enable required permissions in settings", Toast.LENGTH_SHORT).show()
-        } else {
-            bluetoothPermissionGranted = true
         }
     }
 
