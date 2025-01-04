@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.soundplayer"
+    namespace = "com.example.hearassist"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.soundplayer"
-        minSdk = 24
+        applicationId = "com.example.hearassist"
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

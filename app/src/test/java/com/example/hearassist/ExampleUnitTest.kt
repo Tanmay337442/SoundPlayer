@@ -1,4 +1,4 @@
-package com.example.soundplayer
+package com.example.hearassist
 
 import org.junit.Test
 

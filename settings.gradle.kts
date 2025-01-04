@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Sound Player"
+rootProject.name = "HearAssist"
 include(":app")
  

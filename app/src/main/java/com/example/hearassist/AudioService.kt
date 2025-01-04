@@ -1,4 +1,4 @@
-package com.example.soundplayer
+package com.example.hearassist
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -46,7 +46,7 @@ class AudioService : Service() {
             .setAudioAttributes(
                 AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
                     .build())
             .setAudioFormat(AudioFormat.Builder()
                 .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
@@ -60,15 +60,13 @@ class AudioService : Service() {
     }
 
     private fun startForegroundService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Audio Service",
-                NotificationManager.IMPORTANCE_LOW
-            )
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Audio Service",
+            NotificationManager.IMPORTANCE_LOW
+        )
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -82,7 +80,6 @@ class AudioService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         isRecording = true
         val factor = intent?.getDoubleExtra("factor", 1.0) ?: 1.0
-        Log.d("AudioService", "Factor received: $factor")
         thread = Thread {
             val buffer = ByteArray(bufferSize)
             val shortBuffer = ShortArray(bufferSize/2)
