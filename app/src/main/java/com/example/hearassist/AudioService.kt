@@ -86,7 +86,7 @@ class AudioService : Service() {
             while (isRecording) {
                 val numBytesRead = audioRecord.read(buffer, 0, bufferSize)
                 if (numBytesRead > 0) {
-                    for (i in 0..<numBytesRead step 2) {
+                    for (i in 0 until numBytesRead step 2) {
                         var sound = (((buffer[i + 1].toInt() shl 8) or (buffer[i].toInt() and 0xFF))*factor).toInt().toShort()
                         if (sound > Short.MAX_VALUE) {
                             sound = Short.MAX_VALUE
@@ -109,7 +109,7 @@ class AudioService : Service() {
         audioRecord.stop()
         audioRecord.release()
         audioTrack.stop()
-        audioRecord.release()
+        audioTrack.release()
         thread?.interrupt()
     }
 

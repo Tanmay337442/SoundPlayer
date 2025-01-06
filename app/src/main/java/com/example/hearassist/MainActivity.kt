@@ -86,15 +86,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        registerReceiver(bluetoothReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED))
+        val filter = IntentFilter()
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+        registerReceiver(bluetoothReceiver, filter)
 
     }
 
     private val bluetoothReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            isRunning = false
-            toggleButton.isChecked = false
-            stopAudioService()
+            if (intent.action == BluetoothDevice.ACTION_ACL_DISCONNECTED) {
+                Toast.makeText(context, "Bluetooth device disconnected", Toast.LENGTH_SHORT).show()
+                isRunning = false
+                toggleButton.isChecked = false
+                stopAudioService()
+            } else if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR) == BluetoothAdapter.STATE_OFF) {
+                Toast.makeText(context, "Bluetooth turned off", Toast.LENGTH_SHORT).show()
+                isRunning = false
+                toggleButton.isChecked = false
+                stopAudioService()
+            }
         }
     }
 
